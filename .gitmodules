@@ -6,3 +6,6 @@
 	path = extension-ci-tools
 	url = https://github.com/duckdb/extension-ci-tools.git
 	branch = main
+[submodule "submodules/faker-cxx"]
+	path = submodules/faker-cxx
+	url = https://github.com/cieslarmichal/faker-cxx.git
