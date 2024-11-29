@@ -1,0 +1,10 @@
+build
+cmake-build-debug/
+cmake-build-release/
+.idea
+cmake-build-debug
+duckdb_unittest_tempdir/
+.DS_Store
+testext
+test/python/__pycache__/
+.Rhistory
