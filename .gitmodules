@@ -8,4 +8,4 @@
 	branch = main
 [submodule "submodules/faker-cxx"]
 	path = submodules/faker-cxx
-	url = https://github.com/cieslarmichal/faker-cxx.git
+	url = https://github.com/Flogex/faker-cxx.git
