@@ -1,44 +1,33 @@
 #define DUCKDB_EXTENSION_MAIN
 
 #include "faker_extension.hpp"
-#include "duckdb.hpp"
-#include "duckdb/common/exception.hpp"
-#include "duckdb/common/string_util.hpp"
-#include "duckdb/function/scalar_function.hpp"
+#include "duckdb/common/types.hpp"
+#include "duckdb/main/database.hpp"
 #include "duckdb/main/extension_util.hpp"
-#include <duckdb/parser/parsed_data/create_scalar_function_info.hpp>
-
-#include "faker-cxx/person.h"
+#include "table_functions/numbers.hpp"
 
 namespace duckdb {
 
-inline void QuackScalarFun(DataChunk &args, ExpressionState &_, Vector &result) {
-	D_ASSERT(args.ColumnCount() == 0);
-
-    result.SetVectorType(VectorType::CONSTANT_VECTOR);
-
-	const auto personFullName = faker::person::fullName();
-    result.SetValue(0, duckdb::Value("Quack " + personFullName + " 🐥"));
-}
-
-static void LoadInternal(DatabaseInstance &instance) {
-    // Register a scalar function
-    auto quack_scalar_function = ScalarFunction("quack", {}, LogicalType::VARCHAR, QuackScalarFun);
-    ExtensionUtil::RegisterFunction(instance, quack_scalar_function);
+static void RegisterFunctions(DatabaseInstance &instance) {
+    TableFunction random_int_function("random_int", {}, nullptr);
+    random_int_function.in_out_function = duckdb_faker::RandomIntFunction;
+    random_int_function.bind = duckdb_faker::RandomIntBind;
+    random_int_function.init_global = duckdb_faker::RandomIntGlobalInit;
+    ExtensionUtil::RegisterFunction(instance, random_int_function);
 }
 
 void FakerExtension::Load(DuckDB &db) {
-	LoadInternal(*db.instance);
+    DatabaseInstance &instance = *db.instance;
+    RegisterFunctions(instance);
 }
-std::string FakerExtension::Name() {
-	return "quack";
-}
+
+std::string FakerExtension::Name() { return "quack"; }
 
 std::string FakerExtension::Version() const {
 #ifdef EXT_VERSION_QUACK
-	return EXT_VERSION_QUACK;
+    return EXT_VERSION_QUACK;
 #else
-	return "";
+    return "";
 #endif
 }
 
@@ -52,7 +41,7 @@ DUCKDB_EXTENSION_API void faker_init(duckdb::DatabaseInstance &db) {
 }
 
 DUCKDB_EXTENSION_API const char *faker_version() {
-	return duckdb::DuckDB::LibraryVersion();
+    return duckdb::DuckDB::LibraryVersion();
 }
 }
 

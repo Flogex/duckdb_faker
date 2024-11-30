@@ -1,14 +1,15 @@
 #pragma once
 
-#include "duckdb.hpp"
+#include "duckdb/main/extension.hpp"
+#include <string>
 
 namespace duckdb {
 
-class FakerExtension : public Extension {
+class FakerExtension final : public Extension {
 public:
-	void Load(DuckDB &db) override;
-	std::string Name() override;
-        std::string Version() const override;
+    void Load(DuckDB &db) override;
+    std::string Name() override;
+    std::string Version() const override;
 };
 
 } // namespace duckdb
