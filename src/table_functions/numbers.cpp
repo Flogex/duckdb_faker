@@ -15,8 +15,7 @@ unique_ptr<FunctionData> RandomIntBind(ClientContext &, TableFunctionBindInput &
     return nullptr;
 }
 
-OperatorResultType RandomIntFunction(ExecutionContext &, TableFunctionInput &input, DataChunk &,
-                                     DataChunk &output) {
+OperatorResultType RandomIntFunction(ExecutionContext &, TableFunctionInput &input, DataChunk &, DataChunk &output) {
     D_ASSERT(output.ColumnCount() == 1);
     auto &state = input.global_state->Cast<RandomIntGlobalState>();
 

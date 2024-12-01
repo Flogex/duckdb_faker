@@ -21,7 +21,9 @@ void FakerExtension::Load(DuckDB &db) {
     RegisterFunctions(instance);
 }
 
-std::string FakerExtension::Name() { return "quack"; }
+std::string FakerExtension::Name() {
+    return "quack";
+}
 
 std::string FakerExtension::Version() const {
 #ifdef EXT_VERSION_QUACK

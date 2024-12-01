@@ -5,7 +5,7 @@
 #include "duckdb/function/table_function.hpp"
 
 namespace duckdb {
-    class ClientContext;
+class ClientContext;
 }
 
 using namespace duckdb;
