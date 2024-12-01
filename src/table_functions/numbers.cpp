@@ -2,7 +2,6 @@
 #include "duckdb/main/database.hpp"
 
 #include "duckdb/common/vector.hpp"
-#include "duckdb/common/enums/operator_result_type.hpp"
 #include "duckdb/function/function.hpp"
 #include "duckdb/function/table_function.hpp"
 #include "duckdb/common/types.hpp"
@@ -10,6 +9,8 @@
 #include "numbers.hpp"
 #include "faker-cxx/number.h"
 #include <cstdint>
+#include <limits>
+#include <optional>
 
 using namespace duckdb;
 
@@ -21,8 +22,8 @@ namespace duckdb_faker {
 
 namespace {
 struct RandomIntFunctionData final : TableFunctionData {
-    int32_t min;
-    int32_t max;
+    std::optional<int32_t> min;
+    std::optional<int32_t> max;
 };
 
 struct RandomIntGlobalState final : GlobalTableFunctionState {
@@ -34,7 +35,16 @@ unique_ptr<FunctionData> RandomIntBind(ClientContext &, TableFunctionBindInput &
                                        vector<string> &names) {
     return_types.push_back(LogicalType::INTEGER);
     names.push_back("value");
-    return make_uniq<RandomIntFunctionData>();
+
+    auto bind_data = make_uniq<RandomIntFunctionData>();
+    if (input.named_parameters.contains("min")) {
+        bind_data->min = input.named_parameters["min"].GetValue<int32_t>();
+    }
+    if (input.named_parameters.contains("max")) {
+        bind_data->max = input.named_parameters["max"].GetValue<int32_t>();
+    }
+
+    return bind_data;
 }
 
 unique_ptr<GlobalTableFunctionState> RandomIntGlobalInit(ClientContext &, TableFunctionInitInput &) {
@@ -51,8 +61,8 @@ void RandomIntExecute(ClientContext &, TableFunctionInput &input, DataChunk &out
     }
 
     const auto &bind_data = input.bind_data->Cast<RandomIntFunctionData>();
-    const int32_t min = bind_data.min;
-    const int32_t max = bind_data.max;
+    const int32_t min = bind_data.min.value_or(std::numeric_limits<int32_t>::min());
+    const int32_t max = bind_data.max.value_or(std::numeric_limits<int32_t>::max());
 
     const idx_t cardinality = DEFAULT_MAX_GENERATED_ROWS;
     output.SetCardinality(cardinality);
@@ -68,7 +78,6 @@ void RandomIntExecute(ClientContext &, TableFunctionInput &input, DataChunk &out
 
 void RandomIntFunction::RegisterFunction(DatabaseInstance &instance) {
     TableFunction random_int_function("random_int", {}, RandomIntExecute, RandomIntBind, RandomIntGlobalInit);
-    random_int_function.arguments = {LogicalType::BIGINT, LogicalType::BIGINT};
     random_int_function.named_parameters["min"] = LogicalType::INTEGER;
     random_int_function.named_parameters["max"] = LogicalType::INTEGER;
     ExtensionUtil::RegisterFunction(instance, random_int_function);
