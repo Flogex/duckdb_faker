@@ -3,22 +3,13 @@
 #include "faker_extension.hpp"
 #include "duckdb/common/types.hpp"
 #include "duckdb/main/database.hpp"
-#include "duckdb/main/extension_util.hpp"
 #include "table_functions/numbers.hpp"
 
 namespace duckdb {
 
-static void RegisterFunctions(DatabaseInstance &instance) {
-    TableFunction random_int_function("random_int", {}, nullptr);
-    random_int_function.in_out_function = duckdb_faker::RandomIntFunction;
-    random_int_function.bind = duckdb_faker::RandomIntBind;
-    random_int_function.init_global = duckdb_faker::RandomIntGlobalInit;
-    ExtensionUtil::RegisterFunction(instance, random_int_function);
-}
-
 void FakerExtension::Load(DuckDB &db) {
     DatabaseInstance &instance = *db.instance;
-    RegisterFunctions(instance);
+    duckdb_faker::RandomIntFunction::RegisterFunction(instance);
 }
 
 std::string FakerExtension::Name() {
