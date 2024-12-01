@@ -17,7 +17,6 @@ namespace duckdb {
 class ClientContext;
 }
 
-
 namespace duckdb_faker {
 
 namespace {

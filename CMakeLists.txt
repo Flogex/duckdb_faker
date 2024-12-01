@@ -17,7 +17,8 @@ set(BUILD_TESTING OFF)
 add_subdirectory(submodules/faker-cxx)
 
 set(SOURCE_FILES
-    src/faker_extension.cpp)
+    src/faker_extension.cpp
+    src/table_functions/numbers.cpp)
 
 build_static_extension(${TARGET_NAME} ${SOURCE_FILES})
 build_loadable_extension(${TARGET_NAME} " " ${SOURCE_FILES})
@@ -43,3 +44,5 @@ install(
     EXPORT "${DUCKDB_EXPORT_SET}"
     LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
     ARCHIVE DESTINATION "${INSTALL_LIB_DIR}")
+
+add_subdirectory(test)
